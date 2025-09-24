@@ -58,109 +58,34 @@ Our ML Commons formula patches:
 - Updates PyTorch references from 2.5.1 to 2.2.2
 - Adjusts gson from 2.11.0 to 2.10.1 for compatibility
 
-## Installation
-
-### Full Installation (Recommended)
-```bash
-# Add the tap
-brew tap knoguchi/opensearch
-
-# Install everything including ML models
-brew install opensearch  # From core Homebrew
-brew install opensearch-ml-commons opensearch-ml-models
-
-# Start OpenSearch
-brew services start opensearch
-
-# Verify plugins
-opensearch-plugin list
-```
-
-### Core Only
-```bash
-# Just OpenSearch (from core Homebrew) without ML plugins
-brew install opensearch
-brew services start opensearch
-```
-
-### Manual Plugin Installation
-```bash
-# Install OpenSearch first (from core Homebrew)
-brew install opensearch
-
-# Add plugins from this tap later
-brew install opensearch-job-scheduler
-brew install opensearch-ml-commons
-brew install opensearch-ml-models
-```
-
-## Configuration
-
-### Default Paths
-- **Config:** `/opt/homebrew/etc/opensearch/` (Apple Silicon) or `/usr/local/etc/opensearch/` (Intel)
-- **Data:** `/opt/homebrew/var/lib/opensearch/`
-- **Logs:** `/opt/homebrew/var/log/opensearch/`
-- **Plugins:** `/opt/homebrew/var/opensearch/plugins/`
-
-### Default Settings
-- Cluster name: `opensearch_homebrew`
-- HTTP port: `9200`
-- Transport port: `9300`
-
-### Custom Configuration
-Edit the configuration file:
-```bash
-# Apple Silicon
-nano /opt/homebrew/etc/opensearch/opensearch.yml
-
-# Intel Mac
-nano /usr/local/etc/opensearch/opensearch.yml
-```
-
 ## Usage
-
-### Starting/Stopping
-```bash
-# Start OpenSearch
-brew services start opensearch
-
-# Stop OpenSearch
-brew services stop opensearch
-
-# Restart OpenSearch
-brew services restart opensearch
-
-# Run in foreground (for debugging)
-opensearch
-```
 
 ### Verify Installation
 ```bash
-# Check if running
-curl -XGET https://localhost:9200 -ku 'admin:admin'
+# Check ML Commons configuration
+curl "http://localhost:9200/_cluster/settings?pretty"
 
-# List installed plugins
+# List all registered models (main verification)
+curl "http://localhost:9200/_plugins/_ml/models/_search?pretty" \
+  -H "Content-Type: application/json" \
+  -d '{"query": {"match_all": {}}}'
+
+# Check installed plugins
 opensearch-plugin list
-
-# Check cluster health
-curl -XGET https://localhost:9200/_cluster/health?pretty -ku 'admin:admin'
 ```
 
 ### ML Commons Operations
 ```bash
-# Check ML Commons status
-opensearch-ml-setup status
-
-# Test model functionality
-opensearch-ml-setup test-models
-
 # List all registered models
-curl -X GET "http://localhost:9200/_plugins/_ml/models/_search" \
+curl "http://localhost:9200/_plugins/_ml/models/_search?pretty" \
   -H "Content-Type: application/json" \
   -d '{"query": {"match_all": {}}}'
 
+# Check ML Commons stats
+curl "http://localhost:9200/_plugins/_ml/stats?pretty"
+
 # Check cluster health
-curl -XGET http://localhost:9200/_cluster/health?pretty
+curl "http://localhost:9200/_cluster/health?pretty"
 ```
 
 ### Pre-installed ML Models
@@ -215,16 +140,6 @@ If you see errors like `Symbol not found: __ZN2at4_ops10avg_pool2d4callER...`:
 2. Reinstall ML Commons: `brew reinstall opensearch-ml-commons`
 3. Restart OpenSearch: `brew services restart opensearch`
 
-### Port Conflicts
-If port 9200 is already in use:
-```bash
-# Find what's using port 9200
-lsof -i :9200
-
-# Change port in opensearch.yml
-echo "http.port: 9201" >> /opt/homebrew/etc/opensearch/opensearch.yml
-```
-
 ### Memory Issues
 OpenSearch requires significant memory. Adjust JVM heap size:
 ```bash
@@ -234,21 +149,6 @@ nano /opt/homebrew/etc/opensearch/jvm.options
 # Set heap size (example: 4GB)
 -Xms4g
 -Xmx4g
-```
-
-## Building from Source
-
-To modify formulas or contribute:
-```bash
-# Clone this tap
-git clone https://github.com/knoguchi/homebrew-opensearch
-cd homebrew-opensearch
-
-# Edit formulas
-nano Formula/opensearch-ml-commons.rb
-
-# Test locally
-brew install --build-from-source Formula/opensearch-ml-commons.rb
 ```
 
 ## Versions
@@ -261,25 +161,6 @@ brew install --build-from-source Formula/opensearch-ml-commons.rb
 | DJL | 0.28.0 | Downgraded from 0.31.1 for Intel Macs |
 | PyTorch | 2.2.2 | Last version supporting Intel Macs |
 
-## Contributing
-
-Issues and PRs are welcome! Please include:
-- macOS version (e.g., Ventura 13.5)
-- Chip architecture (Apple Silicon M1/M2/M3 or Intel)
-- Error messages
-- Output of `brew config` and `brew doctor`
-
 ## License
 
 Apache 2.0 (matching OpenSearch)
-
-## Related Links
-
-- [OpenSearch Documentation](https://opensearch.org/docs/latest/)
-- [ML Commons Documentation](https://opensearch.org/docs/latest/ml-commons-plugin/index/)
-- [OpenSearch GitHub](https://github.com/opensearch-project/OpenSearch)
-- [ML Commons GitHub](https://github.com/opensearch-project/ml-commons)
-
-## Acknowledgments
-
-Patches based on debugging PyTorch/DJL compatibility issues. Thanks to the OpenSearch community for the base software.

@@ -60,90 +60,24 @@ Our ML Commons formula patches:
 
 ## Installation
 
-### Full Installation (Recommended)
 ```bash
-# Add the tap
 brew tap knoguchi/opensearch
-
-# Install everything including ML models
-brew install opensearch  # From core Homebrew
-brew install opensearch-ml-commons opensearch-ml-models
-
-# Start OpenSearch
+brew install opensearch opensearch-ml-commons opensearch-ml-models
 brew services start opensearch
-
-# Verify plugins
-opensearch-plugin list
-```
-
-### Core Only
-```bash
-# Just OpenSearch (from core Homebrew) without ML plugins
-brew install opensearch
-brew services start opensearch
-```
-
-### Manual Plugin Installation
-```bash
-# Install OpenSearch first (from core Homebrew)
-brew install opensearch
-
-# Add plugins from this tap later
-brew install opensearch-job-scheduler
-brew install opensearch-ml-commons
-brew install opensearch-ml-models
-```
-
-## Configuration
-
-### Default Paths
-- **Config:** `/opt/homebrew/etc/opensearch/` (Apple Silicon) or `/usr/local/etc/opensearch/` (Intel)
-- **Data:** `/opt/homebrew/var/lib/opensearch/`
-- **Logs:** `/opt/homebrew/var/log/opensearch/`
-- **Plugins:** `/opt/homebrew/var/opensearch/plugins/`
-
-### Default Settings
-- Cluster name: `opensearch_homebrew`
-- HTTP port: `9200`
-- Transport port: `9300`
-
-### Custom Configuration
-Edit the configuration file:
-```bash
-# Apple Silicon
-nano /opt/homebrew/etc/opensearch/opensearch.yml
-
-# Intel Mac
-nano /usr/local/etc/opensearch/opensearch.yml
 ```
 
 ## Usage
 
-### Starting/Stopping
-```bash
-# Start OpenSearch
-brew services start opensearch
-
-# Stop OpenSearch
-brew services stop opensearch
-
-# Restart OpenSearch
-brew services restart opensearch
-
-# Run in foreground (for debugging)
-opensearch
-```
-
 ### Verify Installation
 ```bash
 # Check if running
-curl -XGET https://localhost:9200 -ku 'admin:admin'
+curl -XGET http://localhost:9200
 
 # List installed plugins
 opensearch-plugin list
 
 # Check cluster health
-curl -XGET https://localhost:9200/_cluster/health?pretty -ku 'admin:admin'
+curl -XGET http://localhost:9200/_cluster/health?pretty
 ```
 
 ### ML Commons Operations
@@ -215,16 +149,6 @@ If you see errors like `Symbol not found: __ZN2at4_ops10avg_pool2d4callER...`:
 2. Reinstall ML Commons: `brew reinstall opensearch-ml-commons`
 3. Restart OpenSearch: `brew services restart opensearch`
 
-### Port Conflicts
-If port 9200 is already in use:
-```bash
-# Find what's using port 9200
-lsof -i :9200
-
-# Change port in opensearch.yml
-echo "http.port: 9201" >> /opt/homebrew/etc/opensearch/opensearch.yml
-```
-
 ### Memory Issues
 OpenSearch requires significant memory. Adjust JVM heap size:
 ```bash
@@ -234,21 +158,6 @@ nano /opt/homebrew/etc/opensearch/jvm.options
 # Set heap size (example: 4GB)
 -Xms4g
 -Xmx4g
-```
-
-## Building from Source
-
-To modify formulas or contribute:
-```bash
-# Clone this tap
-git clone https://github.com/knoguchi/homebrew-opensearch
-cd homebrew-opensearch
-
-# Edit formulas
-nano Formula/opensearch-ml-commons.rb
-
-# Test locally
-brew install --build-from-source Formula/opensearch-ml-commons.rb
 ```
 
 ## Versions

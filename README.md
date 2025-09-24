@@ -1,4 +1,4 @@
-# Homebrew OpenSearch Tap
+# Homebrew OpenSearch-ML Tap
 
 Custom Homebrew formulas for OpenSearch with ML Commons plugin support and Intel Mac compatibility patches.
 

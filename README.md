@@ -58,43 +58,34 @@ Our ML Commons formula patches:
 - Updates PyTorch references from 2.5.1 to 2.2.2
 - Adjusts gson from 2.11.0 to 2.10.1 for compatibility
 
-## Installation
-
-```bash
-brew tap knoguchi/opensearch
-brew install opensearch opensearch-ml-commons opensearch-ml-models
-brew services start opensearch
-```
-
 ## Usage
 
 ### Verify Installation
 ```bash
-# Check if running
-curl -XGET http://localhost:9200
+# Check ML Commons configuration
+curl "http://localhost:9200/_cluster/settings?pretty"
 
-# List installed plugins
+# List all registered models (main verification)
+curl "http://localhost:9200/_plugins/_ml/models/_search?pretty" \
+  -H "Content-Type: application/json" \
+  -d '{"query": {"match_all": {}}}'
+
+# Check installed plugins
 opensearch-plugin list
-
-# Check cluster health
-curl -XGET http://localhost:9200/_cluster/health?pretty
 ```
 
 ### ML Commons Operations
 ```bash
-# Check ML Commons status
-opensearch-ml-setup status
-
-# Test model functionality
-opensearch-ml-setup test-models
-
 # List all registered models
-curl -X GET "http://localhost:9200/_plugins/_ml/models/_search" \
+curl "http://localhost:9200/_plugins/_ml/models/_search?pretty" \
   -H "Content-Type: application/json" \
   -d '{"query": {"match_all": {}}}'
 
+# Check ML Commons stats
+curl "http://localhost:9200/_plugins/_ml/stats?pretty"
+
 # Check cluster health
-curl -XGET http://localhost:9200/_cluster/health?pretty
+curl "http://localhost:9200/_cluster/health?pretty"
 ```
 
 ### Pre-installed ML Models
@@ -170,25 +161,6 @@ nano /opt/homebrew/etc/opensearch/jvm.options
 | DJL | 0.28.0 | Downgraded from 0.31.1 for Intel Macs |
 | PyTorch | 2.2.2 | Last version supporting Intel Macs |
 
-## Contributing
-
-Issues and PRs are welcome! Please include:
-- macOS version (e.g., Ventura 13.5)
-- Chip architecture (Apple Silicon M1/M2/M3 or Intel)
-- Error messages
-- Output of `brew config` and `brew doctor`
-
 ## License
 
 Apache 2.0 (matching OpenSearch)
-
-## Related Links
-
-- [OpenSearch Documentation](https://opensearch.org/docs/latest/)
-- [ML Commons Documentation](https://opensearch.org/docs/latest/ml-commons-plugin/index/)
-- [OpenSearch GitHub](https://github.com/opensearch-project/OpenSearch)
-- [ML Commons GitHub](https://github.com/opensearch-project/ml-commons)
-
-## Acknowledgments
-
-Patches based on debugging PyTorch/DJL compatibility issues. Thanks to the OpenSearch community for the base software.

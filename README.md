@@ -6,19 +6,21 @@ Custom Homebrew formulas for OpenSearch with ML Commons plugin support and Intel
 
 ```bash
 # Add this tap
-brew tap yourusername/opensearch
+brew tap knoguchi/opensearch
 
-# Install OpenSearch with ML plugins
-brew install opensearch
+# Install OpenSearch with ML plugins and models
+brew install opensearch  # From core Homebrew
 brew install opensearch-ml-commons  # Automatically installs job-scheduler
+brew install opensearch-ml-models   # Installs and configures ML models
 ```
 
 ## Available Formulas
 
-### `opensearch`
-- **Version:** 3.2.0
+### `opensearch` (from core Homebrew)
+- **Version:** 3.2.0  
 - **Description:** Core OpenSearch distributed search engine
 - **Installation:** `brew install opensearch`
+- **Note:** This formula comes from the official Homebrew core tap
 
 ### `opensearch-job-scheduler`
 - **Version:** 3.2.0.0
@@ -32,6 +34,14 @@ brew install opensearch-ml-commons  # Automatically installs job-scheduler
 - **Installation:** `brew install opensearch-ml-commons`
 - **Includes:** Intel Mac PyTorch compatibility patches
 - **Dependencies:** Automatically installs job-scheduler
+
+### `opensearch-ml-models`
+- **Version:** 1.0.0
+- **Description:** Default ML models for OpenSearch ML Commons
+- **Installation:** `brew install opensearch-ml-models`
+- **Includes:** Neural Sparse V2, Text Embedding, Cross-Encoder models
+- **Memory:** Automatically configures 4GB JVM heap
+- **Dependencies:** Requires opensearch-ml-commons
 
 ## Intel Mac Compatibility
 
@@ -53,10 +63,11 @@ Our ML Commons formula patches:
 ### Full Installation (Recommended)
 ```bash
 # Add the tap
-brew tap yourusername/opensearch
+brew tap knoguchi/opensearch
 
-# Install everything
-brew install opensearch opensearch-ml-commons
+# Install everything including ML models
+brew install opensearch  # From core Homebrew
+brew install opensearch-ml-commons opensearch-ml-models
 
 # Start OpenSearch
 brew services start opensearch
@@ -67,19 +78,20 @@ opensearch-plugin list
 
 ### Core Only
 ```bash
-# Just OpenSearch without ML plugins
+# Just OpenSearch (from core Homebrew) without ML plugins
 brew install opensearch
 brew services start opensearch
 ```
 
 ### Manual Plugin Installation
 ```bash
-# Install OpenSearch first
+# Install OpenSearch first (from core Homebrew)
 brew install opensearch
 
-# Add plugins later
+# Add plugins from this tap later
 brew install opensearch-job-scheduler
 brew install opensearch-ml-commons
+brew install opensearch-ml-models
 ```
 
 ## Configuration
@@ -137,17 +149,50 @@ curl -XGET https://localhost:9200/_cluster/health?pretty -ku 'admin:admin'
 ### ML Commons Operations
 ```bash
 # Check ML Commons status
-curl -XGET https://localhost:9200/_plugins/_ml/profile -ku 'admin:admin'
+opensearch-ml-setup status
 
-# Deploy a model (example)
-curl -XPOST https://localhost:9200/_plugins/_ml/models/_upload \
-  -H 'Content-Type: application/json' \
-  -ku 'admin:admin' \
-  -d '{
-    "name": "huggingface/sentence-transformers/all-MiniLM-L6-v2",
-    "version": "1.0.1",
-    "model_format": "TORCH_SCRIPT"
-  }'
+# Test model functionality
+opensearch-ml-setup test-models
+
+# List all registered models
+curl -X GET "http://localhost:9200/_plugins/_ml/models/_search" \
+  -H "Content-Type: application/json" \
+  -d '{"query": {"match_all": {}}}'
+
+# Check cluster health
+curl -XGET http://localhost:9200/_cluster/health?pretty
+```
+
+### Pre-installed ML Models
+
+The `opensearch-ml-models` formula automatically installs and configures three production-ready models:
+
+#### Neural Sparse V2 Distill
+- **Purpose:** Sparse encoding for search (recommended)
+- **Model:** `amazon/neural-sparse/opensearch-neural-sparse-encoding-v2-distill`
+- **Use case:** Semantic search with keyword-like performance
+
+#### Text Embedding (all-MiniLM-L6-v2)
+- **Purpose:** Vector embeddings for similarity search
+- **Model:** `huggingface/sentence-transformers/all-MiniLM-L6-v2`
+- **Use case:** Dense vector search, recommendations
+
+#### Cross-Encoder (ms-marco-MiniLM-L-12-v2)
+- **Purpose:** Re-ranking search results
+- **Model:** `huggingface/sentence-transformers/ms-marco-MiniLM-L-12-v2`
+- **Use case:** Improve search relevance through reranking
+
+### Model Management
+```bash
+# Check status of all models
+opensearch-ml-setup status
+
+# Test model functionality
+opensearch-ml-setup test-models
+
+# Clean removal (removes models before uninstalling)
+opensearch-ml-setup clean
+brew uninstall opensearch-ml-commons
 ```
 
 ## Troubleshooting
@@ -196,7 +241,7 @@ nano /opt/homebrew/etc/opensearch/jvm.options
 To modify formulas or contribute:
 ```bash
 # Clone this tap
-git clone https://github.com/yourusername/homebrew-opensearch
+git clone https://github.com/knoguchi/homebrew-opensearch
 cd homebrew-opensearch
 
 # Edit formulas

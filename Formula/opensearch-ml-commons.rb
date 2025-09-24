@@ -26,6 +26,15 @@ class OpensearchMlCommons < Formula
 
   def post_install
     opensearch = Formula["opensearch"]
+    
+    # Check if plugin is already installed
+    plugin_list = `#{opensearch.bin}/opensearch-plugin list 2>/dev/null`.strip
+    
+    if plugin_list.include?("opensearch-ml")
+      puts "==> opensearch-ml plugin already installed, updating..."
+      system opensearch.bin/"opensearch-plugin", "remove", "opensearch-ml", :out => File::NULL, :err => File::NULL
+    end
+    
     system opensearch.bin/"opensearch-plugin", "install", "--batch",
            "file://#{libexec}/plugin.zip"
   end

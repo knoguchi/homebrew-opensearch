@@ -14,7 +14,7 @@ class OpensearchMlModels < Formula
 
   # Constants
   OPENSEARCH_URL = "http://localhost:9200"
-  ML_STATE_DIR = "/usr/local/var/lib/opensearch/ml-commons"
+  ML_STATE_DIR = "#{Dir.home}/.opensearch/ml-commons"
   MODEL_GROUP_FILE = "#{ML_STATE_DIR}/model_group_id"
   MODEL_ID_FILE = "#{ML_STATE_DIR}/model_id"
 

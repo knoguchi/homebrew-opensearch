@@ -15,7 +15,7 @@ class OpensearchKnn < Formula
     system "gradle", "bundlePlugin", "-x", "test", 
            "-PopensearchVersion=3.2.0"
     
-    plugin_file = Dir["plugin/build/distributions/opensearch-knn-*.zip"].first
+    plugin_file = Dir["build/distributions/opensearch-knn-*.zip"].first
     raise "Plugin zip file not found" unless plugin_file
     libexec.install plugin_file => "plugin.zip"
   end

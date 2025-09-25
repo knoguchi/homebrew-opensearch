@@ -43,6 +43,11 @@ brew install opensearch-ml-models   # Installs and configures ML models
 - **Memory:** Automatically configures 4GB JVM heap
 - **Dependencies:** Requires opensearch-ml-commons
 
+### `opensearch-knn`
+- **Version:** 3.2.0.0
+- **Description:** K-nearest neighbors (k-NN) plugin for OpenSearch
+- **Installation:** `brew install opensearch-knn`
+
 ## Intel Mac Compatibility
 
 This tap includes critical patches for ML Commons on Intel Macs to resolve PyTorch compatibility issues:
